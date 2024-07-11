@@ -20,7 +20,6 @@ from scipy.stats import truncnorm
 
 import gower
 import gc
-import prince
 
 from statistics import mean
 from enum import Enum
@@ -282,49 +281,6 @@ class PrivacyEvaluator(BaseEvaluator) :
         x_moins_mean = x - mean
         return np.sqrt(np.dot(np.dot(x_moins_mean, inv_cov_matrix), x_moins_mean.T))
     
-    def get_gower_matrix_with_famd(self, save_path = None) :
-        is_categorical = [col in self._categorical_columns for col in self._real.columns]
-
-        famd = prince.FAMD(
-            n_components=5,  # number of components to keep
-            n_iter=3,        # number of iterations of the power method
-            copy=True,       # whether to copy the data or operate in-place
-            check_input=True, # whether to check the consistency of the inputs
-            engine='sklearn',    # backend to use, 'auto' uses FBPCA if installed, otherwise 'sklearn'
-            random_state=42   # a random state for reproducibility
-        )
-
-        columns_to_convert= self._real.select_dtypes(exclude='category').columns
-        for column in columns_to_convert:
-            self._real[column] = self._real[column].astype(float)
-            self._synth[column] = self._synth[column].astype(float)
-
-        # Fit FAMD to your data and transform it
-        famd = famd.fit(self._real)       # df is the dataframe containing mixed types
-        df_real = famd.transform(self._real)
-        df_synth = famd.transform(self._synth)
-
-        real_synth = gower.gower_matrix(df_real, df_synth)
-        synth_real = gower.gower_matrix(df_synth, df_real)
-
-        dif_synth_real_u = np.triu(synth_real)
-        dif_synth_real_l = np.tril(real_synth, k=-1)
-
-        del real_synth
-        del synth_real
-
-        dif_synth_real = dif_synth_real_u + dif_synth_real_l
-
-        del dif_synth_real_u
-        del dif_synth_real_l
-
-        if save_path == None :
-            return dif_synth_real
-        else :
-            with open(save_path +'.pkl', 'wb') as file:
-                pickle.dump(dif_synth_real, file)
-            del dif_synth_real
-            return None
 
     def get_gower_matrix(self, save_path = None) :
         is_categorical = [col in self._categorical_columns for col in self._real.columns]

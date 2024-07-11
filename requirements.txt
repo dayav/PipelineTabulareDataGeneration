@@ -1,0 +1,12 @@
+anonymeter
+dython
+gower
+ipykernel
+joblib
+pandas
+rbo
+scikit-learn
+sdv
+shap
+xgboost
+-e .

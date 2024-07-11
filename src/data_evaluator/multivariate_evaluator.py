@@ -64,8 +64,8 @@ class MultivariateEvaluator(BaseEvaluator) :
     def get_correlation_ratio_matrix(self, df):
         
         correlation_matrix = associations(df, 
-              self._categorical_columns.to_list(),
-              self._numerical_columns.to_list(),
+              nominal_columns=self._categorical_columns.to_list(),
+              numerical_columns=self._numerical_columns.to_list(),
               hide_rows=self._categorical_columns.to_list(),
                hide_columns=self._numerical_columns.to_list(),
                plot=False
