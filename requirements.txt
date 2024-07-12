@@ -2,6 +2,7 @@ anonymeter
 dython
 gower
 ipykernel
+ipywidgets
 joblib
 pandas
 rbo
