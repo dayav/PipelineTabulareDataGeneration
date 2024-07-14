@@ -67,34 +67,40 @@ class ResemblanceReport :
     #         self.num_uni[j_acc] = self._uni_evaluators[j_acc].num_uni
 
 
-    # def get_numerical_univariate_report(self) :
-    #     accordions = []
-    #     box_plot_data = dict()
-    #     cohens_means = dict()
+    def get_numerical_univariate_report(self) :
+        accordions = []
+        box_plot_data = dict()
+        cohens_means = dict()
 
-    #     for j_acc, j in zip(self._evaluation_dict, range(len(self._evaluation_dict))) :
-    #         eval = self._uni_evaluators[j_acc].get_numerical_stat_evaluation()
-    #         tabular_output_1 = widgets.HTML(eval[0].to_html())
-    #         tabular_output_2 = widgets.HTML(eval[1].to_html())
-    #         tabular_output_3 = widgets.HTML(eval[2].to_frame().to_html())
-    #         box_plot_data[j_acc] = eval[1].data['cohen_s_d']
-    #         cohens_means[j_acc] = eval[2]
-    #         dropdown = widgets.Dropdown(options=self._uni_evaluators[j_acc]._numerical_columns, description='Columns:')
-    #         output = widgets.interactive_output(self.display_dataframe_and_plot,
-    #                                                 {'real':widgets.fixed(self._evaluation_dict[j_acc][0]),'synth': widgets.fixed(self._evaluation_dict[j_acc][1]), 'column': dropdown})
+        for j_acc, j in zip(self._pipeline_results, range(len(self._pipeline_results))) :
+            numerical_univariate_result = self._pipeline_results[j_acc]['resemblance_evaluation_results']['numerical_univariate']
+            synthetic_data = self._pipeline_results[j_acc]['generation_results']['synthetic_data']
+            
+            statistical_test = numerical_univariate_result['univariate_num_s'].style.applymap(UnivariateEvaluator.style_negative, props='color:red;') 
+            divergences = numerical_univariate_result['univariate_num_js'].style.applymap(UnivariateEvaluator.style_binary, props='color:red;', subset= pd.IndexSlice[:, ['JS_divergence']])  
+            divergences_mean = numerical_univariate_result['univariate_num_js_data_mean']  
+                        
+            tabular_output_1 = widgets.HTML(statistical_test.to_html())
+            tabular_output_2 = widgets.HTML(divergences.to_html())
+            tabular_output_3 = widgets.HTML(divergences_mean.to_frame().to_html())
+            box_plot_data[j_acc] = divergences.data['cohen_s_d']
+            cohens_means[j_acc] = divergences_mean
+            dropdown = widgets.Dropdown(options=self._numerical_columns, description='Columns:')
+            output = widgets.interactive_output(self.display_dataframe_and_plot,
+                                                    {'real':widgets.fixed(self._real_data),'synthetic': widgets.fixed(synthetic_data), 'column': dropdown})
 
-    #         accordion = widgets.Accordion(children=[widgets.VBox([widgets.HBox([tabular_output_1, tabular_output_2, tabular_output_3]), dropdown, output])])
-    #         accordion.set_title(0, j_acc)
-    #         accordions.append(accordion)
+            accordion = widgets.Accordion(children=[widgets.VBox([widgets.HBox([tabular_output_1, tabular_output_2, tabular_output_3]), dropdown, output])])
+            accordion.set_title(0, j_acc)
+            accordions.append(accordion)
 
-    #     tabular_output_1 = widgets.Button(description="Show Boxplot")
-    #     tabular_output_1.on_click(lambda b : self.plot_boxplot( box_plot_data, "Cohen's d Boxplots comparison "))
-    #     tabular_output_2 = widgets.HTML(pd.DataFrame(cohens_means).transpose().to_html())
+        tabular_output_1 = widgets.Button(description="Show Boxplot")
+        tabular_output_1.on_click(lambda b : self.plot_boxplot( box_plot_data, "Cohen's d Boxplots comparison "))
+        tabular_output_2 = widgets.HTML(pd.DataFrame(cohens_means).transpose().to_html())
         
-    #     accordion = widgets.Accordion(children=[widgets.VBox([widgets.HBox([tabular_output_1, tabular_output_2])])])
-    #     accordion.set_title(0, 'Summary')
-    #     accordions.append(accordion)
-    #     return widgets.VBox(accordions)
+        accordion = widgets.Accordion(children=[widgets.VBox([widgets.HBox([tabular_output_1, tabular_output_2])])])
+        accordion.set_title(0, 'Summary')
+        accordions.append(accordion)
+        return widgets.VBox(accordions)
     
     # def build_categorical_multivariate_report(self) :
     #     for j_acc, j in zip(self._evaluation_dict, range(len(self._evaluation_dict))) :
