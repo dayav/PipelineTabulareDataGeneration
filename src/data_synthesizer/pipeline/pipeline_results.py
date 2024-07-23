@@ -31,12 +31,23 @@ class UtilityEvaluationResults(TypedDict):
     confusion_matrix_trtr : np.ndarray
     accuracy_mean_tstr : float
     accuracy_mean_trtr : float
+    rbo_permutation_importance : float
+    spearman_permutation_importance : float
+    kendall_permutation_importance : float
+    rbo_shap : float
+    spearman_shap : float
+    kendall_shap : float
 
 class PrivacyEvaluationResults(TypedDict):
     """Dictionary type for storing utility evaluation results."""
+    jensen_shanon_categorical : float
+    jensen_shanon_numerical : float
     dissimilarity_synthetic_real : float
     dissimilarity_synthetic_test : float
+    epsilon_dissimilarity_synthetic_real : float
+    epsilon_dissimilarity_synthetic_test : float
     share : float
+    epsilon : float
     attribute_synthetic_prediction : dict
     attribute_real_prediction : dict
 

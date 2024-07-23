@@ -288,7 +288,6 @@ class UnivariateEvaluator(BaseEvaluator) :
         univariate_num_div['JS_divergence'] = self.jensen_shanon_divergence_numerical()
         univariate_num_div['cohen_s_d'] = self.cohen_s_d()
 
-        
         df = pd.DataFrame(data=univariate_numeric, index=(self._numerical_columns))        
         js = pd.DataFrame(data=univariate_num_div, index=(self._numerical_columns))
 

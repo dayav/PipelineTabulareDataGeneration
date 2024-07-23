@@ -32,7 +32,6 @@ class ClassifierType(Enum):
     NB = 'GaussianNB' 
     SVM = 'SVM'
     XGBOOST = 'XGBoost'
-    XGBOOST_ = 'XGBoost_'
     RANDOM_FOREST = 'Random Forest'
 
 
@@ -171,8 +170,10 @@ class UtilityEvaluation(BaseEvaluator) :
 
         pipeline_shap = Pipeline(steps=[('prep',col_transform_shap)])
         X_train_shap = pipeline_shap.fit_transform(X_train)
+        if not isinstance(X_train_shap, np.ndarray) :
+            X_train_shap = X_train_shap.toarray()
         explainer = shap.Explainer(model)
-        shap_value = explainer(X_train_shap.toarray())
+        shap_value = explainer(X_train_shap)
         feature_names = self._real.columns
         n_categories = []
         for feat in feature_names[:-1]:
@@ -205,8 +206,7 @@ class UtilityEvaluation(BaseEvaluator) :
         shap_value.feature_names = list(feature_names[:-1])
 
         return shap_value
-
-        
+   
     
     def rbo_compare_feature_importance(self, p_i_real, shap_value_real, p_i_synth, shap_value_synth) :
 
